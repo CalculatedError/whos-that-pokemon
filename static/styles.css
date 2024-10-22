@@ -1,0 +1,72 @@
+body {
+    background: linear-gradient(135deg, #2c3e50, #2c3e50);
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
+.title {
+    font-size: 2.5rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+}
+
+.score {
+    font-size: 1.5rem;
+    margin: 20px 0;
+}
+
+.pokemon-image {
+    width: 300px; /* Adjust as necessary */
+    height: auto;
+    border: 5px solid #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+    filter: brightness(0); /* Make the silhouette black */
+    transition: opacity 0.5s ease; /* Add transition for fade effect */
+    margin-bottom: 20px;
+}
+
+.button-container {
+    margin: 20px 0;
+}
+
+.fun-btn {
+    background-color: #ffcc00; /* Button color */
+    border: none;
+    color: #000;
+    border-radius: 15px;
+    cursor: pointer;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    margin: 5px;
+    transition: all 0.3s ease;
+}
+
+.fun-btn:hover {
+    background-color: #ffd700; /* Hover color */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    transform: translateY(-3px); /* Slight lift on hover */
+}
+
+.result {
+    margin-top: 20px;
+    font-size: 1.2rem;
+}
+
+#nextButton {
+    background-color: #27ae60; /* Next button color */
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#nextButton:hover {
+    background-color: #219150; /* Next button hover color */
+}
+

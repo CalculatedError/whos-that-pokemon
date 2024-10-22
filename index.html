@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Image Viewer</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/styles.css">
+    <title>Who’s That Pokémon!?</title>
 </head>
 <body>
-    <img id="pokemon-image" src="" alt="Pokémon Silhouette">
-    <script>
-        async function fetchPokemon() {
-            const response = await fetch('/pokemon');
-            const data = await response.json();
-            document.getElementById('pokemon-image').src = data.silhouetteImage;
-        }
+    <div class="container">
+        <h1 class="title">Who’s That Pokémon!?</h1>
+        <div id="score" class="score">Score: 0</div>
+        <img id="pokemonImage" class="pokemon-image" src="" alt="Pokémon Silhouette">
+        <div id="answers" class="button-container"></div>
+        <button id="nextButton" class="btn fun-btn" onclick="fetchRandomPokemon()">Next Pokémon</button>
+        <div id="result" class="result"></div>
+    </div>
 
-        fetchPokemon();
-    </script>
+    <script src="static/script.js"></script>
 </body>
 </html>

@@ -1,61 +1,73 @@
 import requests
-import flask
-from flask import jsonify
-from flask import Flask
-
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 import random
-
-MAX_POKEMON = 50
-baseUrl = "https://pokeapi.co/api/v2/"
 
 app = Flask(__name__)
 
-#
-# The API should respond with the following information:
-# - The Pokémon ID.
-# - The silhouette image of the Pokémon.
-# - A list of four Pokémon names (the correct name and three decoy names)
-#
+# Constants
+maxPokemon = 50
+numDecoys = 3
+baseUrl = "https://pokeapi.co/api/v2/"
 
-def getPokemonInfo(id):
-    url = "{}/pokemon/{}".format(baseUrl, id)
-    response = requests.get(url)
-    print(response)
+def getPokemonInfo(pokemonId):
+    response = requests.get(f"{baseUrl}pokemon/{pokemonId}")
+    return response.json() if response.status_code == 200 else None
 
-    if response.status_code == 200:
-        print("Success: data retrieved")
-    else:
-        print("Failed to get data, error code: {}".format(response.status_code))
+def getTrueName(pokemonId):
+    pokemonInfo = getPokemonInfo(pokemonId)
+    return pokemonInfo["name"] if pokemonInfo else None
 
-    return response.json()
+def getRandomPokemonId():
+    return random.randint(1, maxPokemon)
 
-def getTrueName(pokemonID):
-    # TODO REPLACE WITH API CALL
-    return "bulbosaur"
-
-def getRandomPokemonID():
-    return random.randint(1, MAX_POKEMON) 
-
-def getSilhouetteImage(pokemonInfo, pokemonID):
+def getSilhouetteImage(pokemonInfo):
     return pokemonInfo["sprites"]["front_default"]
 
-def getDecoyNames():
-    return ["pikachu", "crosshairs", "gregosaur"]
+def getDecoyNames(correctName):
+    decoyNames = set()
+    while len(decoyNames) < numDecoys:
+        pokemonId = getRandomPokemonId()
+        name = getTrueName(pokemonId)
+        if name and name != correctName:
+            decoyNames.add(name)
+    return list(decoyNames)
 
 @app.route('/pokemon', methods=['GET'])
 def getRandomPokemon():
-    pokemonID = getRandomPokemonID()
-    pokemonInfo = getPokemonInfo(pokemonID) 
-    silhouetteImage = getSilhouetteImage(pokemonInfo, pokemonID)
-    decoyNames = getDecoyNames()
-    trueName = getTrueName(pokemonID)
-    pokemonNamesList = [trueName] + decoyNames 
+    pokemonId = getRandomPokemonId()
+    pokemonInfo = getPokemonInfo(pokemonId)
+    if not pokemonInfo:
+        return jsonify({"error": "Could not retrieve Pokémon info"}), 500
+    
+    silhouetteImage = getSilhouetteImage(pokemonInfo)
+    trueName = getTrueName(pokemonId)
+    decoyNames = getDecoyNames(trueName)
+    
+    pokemonNamesList = [trueName] + decoyNames
+    random.shuffle(pokemonNamesList)
 
-    return {"pokemonID": pokemonID,
-            "silhouetteImage": silhouetteImage,
-            "pokemonNamesList": pokemonNamesList
-    }
+    return jsonify({
+        "pokemonID": pokemonId,
+        "silhouetteImage": silhouetteImage,
+        "pokemonNamesList": pokemonNamesList
+    })
+
+@app.route('/verify', methods=['POST'])
+def verifyGuess():
+    data = request.get_json()
+    pokemonId = data.get('pokemonID')
+    guessedName = data.get('guessedName')
+
+    trueName = getTrueName(pokemonId)
+    pokemonInfo = getPokemonInfo(pokemonId)
+    fullImage = pokemonInfo["sprites"]["front_default"] if pokemonInfo else None
+    isCorrect = trueName == guessedName
+
+    return jsonify({
+        "trueName": trueName,
+        "fullImage": fullImage,
+        "isCorrect": isCorrect
+    })
 
 @app.route('/')
 def index():
