@@ -45,22 +45,20 @@ async function checkAnswer(guessedName) {
         });
         const data = await response.json();
 
-        // Check if full image URL is valid
-        if (data.fullImage) {
-            const pokemonImage = document.getElementById('pokemonImage');
-            pokemonImage.src = data.fullImage; // Update to full image
-            pokemonImage.style.filter = 'none'; // Remove the black silhouette effect
+        const pokemonImage = document.getElementById('pokemonImage');
+        pokemonImage.src = data.fullImage;
+        pokemonImage.style.filter = 'none';
+
+        const resultElement = document.getElementById('result');
+        resultElement.innerHTML = `<p>True Name: ${data.trueName}</p>`;
+        
+        if (data.isCorrect) {
+            score++;
+            resultElement.innerHTML += `<p class="correct">Correct!</p>`;
         } else {
-            document.getElementById('result').innerText = 'Error retrieving the full image.';
+            resultElement.innerHTML += `<p class="wrong">Wrong</p>`;
         }
 
-        // Display results
-        document.getElementById('result').innerHTML = `
-            <p>True Name: ${data.trueName}</p>
-            <p>${data.isCorrect ? 'Correct!' : 'Wrong!'}</p>
-        `;
-
-        if (data.isCorrect) score++;
         document.getElementById('score').innerText = `Score: ${score}`;
         document.getElementById('nextButton').disabled = false;
     } catch (error) {
@@ -69,5 +67,6 @@ async function checkAnswer(guessedName) {
         hasGuessed = false;
     }
 }
+
 
 window.onload = fetchRandomPokemon;

@@ -70,3 +70,14 @@ body {
     background-color: #219150; /* Next button hover color */
 }
 
+.correct {
+    color: green;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+}
