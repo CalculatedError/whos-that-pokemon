@@ -2,9 +2,16 @@ let score = 0;
 let currentPokemonID = 0;
 let hasGuessed = false;
 
+// Cache frequently used DOM elements
+const nextButton = document.getElementById('nextButton');
+const resultElement = document.getElementById('result');
+const pokemonImage = document.getElementById('pokemonImage');
+const scoreElement = document.getElementById('score');
+const answersContainer = document.getElementById('answers');
+
 async function fetchRandomPokemon() {
-    document.getElementById('nextButton').disabled = true;
-    document.getElementById('result').innerText = 'Loading...';
+    nextButton.disabled = true;
+    resultElement.innerText = 'Loading...';
 
     try {
         const response = await fetch('/pokemon');
@@ -13,30 +20,36 @@ async function fetchRandomPokemon() {
         const data = await response.json();
         currentPokemonID = data.pokemonID;
 
-        // Set the silhouette image (initially shows as a silhouette)
-        const pokemonImage = document.getElementById('pokemonImage');
+        //
+        // Set silhouette image and reset properties
+        //
         pokemonImage.src = data.silhouetteImage;
-        pokemonImage.style.filter = 'brightness(0)'; // Ensure it's a silhouette
-        pokemonImage.style.opacity = 1; // Reset opacity for the new round
+        pokemonImage.style.filter = 'brightness(0)';
+        pokemonImage.style.opacity = 1;
 
-        // Clear previous buttons and add new ones
-        const answersContainer = document.getElementById('answers');
-        answersContainer.innerHTML = data.pokemonNamesList.map(name => 
-            `<button class="btn fun-btn btn-lg" onclick="checkAnswer('${name}')">${name}</button>`
-        ).join('');
-        
-        document.getElementById('result').innerText = '';
+        //
+        // Generate answer buttons
+        //
+        let buttonsHTML = '';
+
+        for (let i = 0; i < data.pokemonNamesList.length; i++) {
+            const name = data.pokemonNamesList[i];
+            buttonsHTML += '<button class="btn answer-btn btn-lg" onclick="checkAnswer(\'' + name + '\')">' + name + '</button>';
+        }
+
+        answersContainer.innerHTML = buttonsHTML;
+
+        resultElement.innerText = '';
         hasGuessed = false;
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('result').innerText = 'Error loading Pokémon. Please try again.';
+        handleError(error, 'Error loading Pokémon. Please try again.');
     }
 }
 
 async function checkAnswer(guessedName) {
     if (hasGuessed) return;
-
     hasGuessed = true;
+
     try {
         const response = await fetch('/verify', {
             method: 'POST',
@@ -45,28 +58,36 @@ async function checkAnswer(guessedName) {
         });
         const data = await response.json();
 
-        const pokemonImage = document.getElementById('pokemonImage');
+        //
+        // Show full image and remove filter
+        //
         pokemonImage.src = data.fullImage;
         pokemonImage.style.filter = 'none';
 
-        const resultElement = document.getElementById('result');
-        resultElement.innerHTML = `<p>True Name: ${data.trueName}</p>`;
-        
+        //
+        // Display game result
+        //
+        let resultHTML = `<p>True Name: ${data.trueName}</p>`;
         if (data.isCorrect) {
             score++;
-            resultElement.innerHTML += `<p class="correct">Correct!</p>`;
+            resultHTML += `<p class="correct">Correct!</p>`;
         } else {
-            resultElement.innerHTML += `<p class="wrong">Wrong</p>`;
+            resultHTML += `<p class="wrong">Wrong</p>`;
         }
-
-        document.getElementById('score').innerText = `Score: ${score}`;
-        document.getElementById('nextButton').disabled = false;
+        resultElement.innerHTML = resultHTML;
+        scoreElement.innerText = `Score: ${score}`;
+        
+        nextButton.disabled = false;
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('result').innerText = 'Error verifying answer. Please try again.';
+        handleError(error, 'Error verifying answer. Please try again.');
         hasGuessed = false;
     }
 }
 
+function handleError(error, message) {
+    console.error('Error:', error);
+    resultElement.innerText = message;
+}
 
+// Load the first Pokémon when the page loads
 window.onload = fetchRandomPokemon;

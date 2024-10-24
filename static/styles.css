@@ -1,7 +1,7 @@
 body {
-    background: linear-gradient(135deg, #2c3e50, #2c3e50);
+    background: #2c3e50; /* Single color for the background */
     color: #fff;
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif; /* Removed unnecessary quotes */
     text-align: center;
     padding: 20px;
     margin: 0;
@@ -19,13 +19,12 @@ body {
 }
 
 .pokemon-image {
-    width: 300px; /* Adjust as necessary */
-    height: auto;
+    width: 300px;
     border: 5px solid #fff;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
-    filter: brightness(0); /* Make the silhouette black */
-    transition: opacity 0.5s ease; /* Add transition for fade effect */
+    filter: brightness(0); /* Black silhouette */
+    transition: opacity 1s ease; /* Smooth fade */
     margin-bottom: 20px;
 }
 
@@ -33,41 +32,40 @@ body {
     margin: 20px 0;
 }
 
-.fun-btn {
-    background-color: #ffcc00; /* Button color */
-    border: none;
-    color: #000;
-    border-radius: 15px;
-    cursor: pointer;
+.answer-btn, #nextButton {
     padding: 12px 24px;
     font-size: 1.2rem;
-    margin: 5px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.fun-btn:hover {
-    background-color: #ffd700; /* Hover color */
+.answer-btn {
+    background-color: #ffcc00;
+    color: #000;
+    margin: 5px;
+}
+
+.answer-btn:hover {
+    background-color: #ffd700;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    transform: translateY(-3px); /* Slight lift on hover */
+    transform: translateY(-3px);
+}
+
+#nextButton {
+    background-color: #27ae60;
+    color: white;
+    padding: 10px 20px;
+}
+
+#nextButton:hover {
+    background-color: #219150;
 }
 
 .result {
     margin-top: 20px;
     font-size: 1.2rem;
-}
-
-#nextButton {
-    background-color: #27ae60; /* Next button color */
-    padding: 10px 20px;
-    font-size: 1.2rem;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-}
-
-#nextButton:hover {
-    background-color: #219150; /* Next button hover color */
 }
 
 .correct {

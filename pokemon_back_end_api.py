@@ -4,28 +4,35 @@ import random
 
 app = Flask(__name__)
 
-# Constants
-maxPokemon = 50
-numDecoys = 3
-baseUrl = "https://pokeapi.co/api/v2/"
+MAX_POKEMON = 50
+NUM_DECOYS = 3
+BASE_URL = "https://pokeapi.co/api/v2/"
+SUCCESS = 200
+INTERNAL_SERVER_ERROR = 500
 
 def getPokemonInfo(pokemonId):
-    response = requests.get(f"{baseUrl}pokemon/{pokemonId}")
-    return response.json() if response.status_code == 200 else None
+    response = requests.get("{}/pokemon/{}".format(BASE_URL, pokemonId))
+    if response.status_code == SUCCESS:
+        return response.json()
+    else:
+        return None
 
 def getTrueName(pokemonId):
     pokemonInfo = getPokemonInfo(pokemonId)
-    return pokemonInfo["name"] if pokemonInfo else None
+    if pokemonInfo:
+        return pokemonInfo["name"]
+    else:
+        return None
 
 def getRandomPokemonId():
-    return random.randint(1, maxPokemon)
+    return random.randint(1, MAX_POKEMON)
 
 def getSilhouetteImage(pokemonInfo):
     return pokemonInfo["sprites"]["front_default"]
 
 def getDecoyNames(correctName):
     decoyNames = set()
-    while len(decoyNames) < numDecoys:
+    while len(decoyNames) < NUM_DECOYS:
         pokemonId = getRandomPokemonId()
         name = getTrueName(pokemonId)
         if name and name != correctName:
@@ -36,8 +43,9 @@ def getDecoyNames(correctName):
 def getRandomPokemon():
     pokemonId = getRandomPokemonId()
     pokemonInfo = getPokemonInfo(pokemonId)
+
     if not pokemonInfo:
-        return jsonify({"error": "Could not retrieve Pokémon info"}), 500
+        return jsonify({"error": "Could not retrieve Pokémon info from pokeapi"}), INTERNAL_SERVER_ERROR
     
     silhouetteImage = getSilhouetteImage(pokemonInfo)
     trueName = getTrueName(pokemonId)
@@ -60,8 +68,13 @@ def verifyGuess():
 
     trueName = getTrueName(pokemonId)
     pokemonInfo = getPokemonInfo(pokemonId)
-    fullImage = pokemonInfo["sprites"]["front_default"] if pokemonInfo else None
-    isCorrect = trueName == guessedName
+    
+    if pokemonInfo:
+        fullImage = pokemonInfo["sprites"]["front_default"]
+    else:
+        fullImage = None
+    
+    isCorrect = (trueName == guessedName)
 
     return jsonify({
         "trueName": trueName,
@@ -74,4 +87,4 @@ def index():
     return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
